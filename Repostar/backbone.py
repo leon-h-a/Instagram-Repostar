@@ -13,9 +13,9 @@ import re
 
 
 class Session:
-    def __init__(self, me, path, intro, htags, ig_user, ig_pass):
+    def __init__(self, me, path, intro, htags, ig_user, ig_pass, min_likes, margin):
+        self.margin = margin
         self.img_dir = path
-        self.margin = 94
         self.someone = 0
         self.me = me
         self.all_image_urls = []
@@ -36,7 +36,7 @@ class Session:
         self.intro = intro
         self.my_htags = htags
         self.users = None
-        self.min_likes = 300
+        self.min_likes = min_likes
         self.intro = intro
         self.my_htags = htags
         self.my_html = me_html(self.me)
@@ -45,18 +45,7 @@ class Session:
         self.low_like = False
 
 
-    def times(user):
-        vrijeme1 = None
-        vrijeme2 = None
-        with open('/home/pi/controller.txt', 'r') as controller:
-            lines = controller.read().splitlines()
-            for _ in lines:
-                if 'easyg - ' + user + ' - t1' in str(_):
-                    vrijeme1 = _[-5:]
-                if 'easyg - ' + user + ' - t2' in str(_):
-                    vrijeme2 = _[-5:]
-        return vrijeme1, vrijeme2
-
+    #  PROVJERI DAL thisLoop ODGOVARA SUMI SVIH USERA, AKO DA, KRENI ISPOCETKA SA VRHA POPISA
     def loop_done(self):
         with open(self.img_dir + 'users.txt') as users_file:
             users = users_file.read().splitlines()
@@ -81,19 +70,23 @@ class Session:
         else:
             print('Ima jos korisnika')
 
+    #  UZMI PAGE SOURCE OD METE
     def get_target_html(self, someone_html):
         self.someone_html = some_html(someone_html)
 
+    #  IZ PAGE SURCE UZMI BROJ LAJKOVA ZADNJIH 10 SLIKA
     def all_image_like_count(self):
         for _ in range(10):
             self.all_image_likes.append(self.someone_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'][_]['node']['edge_liked_by']['count'])
         return self.all_image_likes
 
+    #  UZMI 10 x 1080px SLIKA
     def all_image_urls_count(self):
         for _ in range(10):
             self.all_image_urls.append(self.someone_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'][_]['node']['display_url'])
         return self.all_image_urls
 
+    #  SORTIRAJ LIKE CNT + LINK OD NAJVECEG DO NAJNIZE
     def find_most_liked(self, user):
         self.captions = []
         self.all_image_urls = []
@@ -129,6 +122,7 @@ class Session:
                 under_adders.write('\n' + user + (35 - len(str(user))) * ' ' + str(list1[-1]))
             return True
 
+    #  POKUPI MOJ BROJ: PRATITELJA / PRATIOCA / OBJAVA
     def my_stats(self):
         self.followers = int(self.my_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_followed_by']['count'])
         self.following = int(self.my_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_follow']['count'])
@@ -147,6 +141,7 @@ class Session:
 
         return (self.posts, self.followers, self.following)
 
+    #  PROVJERI DAL SE SORTIRANA SLIKA NALAZI U BAZI OBJAVLJENIH
     def is_picture_used(self, user):
         if not os.path.exists(self.img_dir + self.me + '.db'):
             raise FileNotFoundError('Baza ne postoji napravi ju (format je <instagramUsername.db>)')
@@ -165,9 +160,11 @@ class Session:
         conn.commit()
         conn.close()
 
+    #  SKINI SLIKU
     def download_pic(self):
         urllib.request.urlretrieve(self.most_liked, self.img_dir + '/images/' + str(self.most_liked)[-85:][:-45] + '.jpg')
 
+    #  UCITAJ SVE KORISNIKE
     def find_users_to_scrape(self):
         if not os.path.exists(self.img_dir + 'users.txt'):
             print('Please provide users to scrape in path/users.txt')
@@ -175,6 +172,7 @@ class Session:
             users = scrape_them.read().splitlines()
         self.users = users
 
+    #  PROVJERI DAL JE KORISNIK VEC SCRAPE-AN U OVOM KRUGU
     def is_user_used_in_this_loop(self, user):
         header = '\n' + 30 * '-' + '[' + user + ']'
         print(header + (70 - len(header)) * '-')
@@ -191,6 +189,7 @@ class Session:
         with open(self.img_dir + 'thisLoop.txt', 'a') as loop_file:
             loop_file.write(user + '\n')
 
+    #  OBJAVI SLIKU
     def upload(self, user):
         pattern = re.compile(r'#')
         matches = len(pattern.findall(self.most_liked_caption))

@@ -4,28 +4,26 @@ from time import sleep
 import schedule
 import EasyG
 import os
-import gc
+
+#  POPIS VREMENA U KOJIMA BOT OBJAVLJUJE
+vremena = ['00:00', '05:00', '16:00']
+vremena.sort()
 
 user = os.path.basename(__file__)[:-3]
-
-# VREMENA
-vremena = Session.times(user)
-
-print('Kao [' + user + '] objavljujem u: {}h i u {}h'.format(vremena[0], vremena[1]))
+print('Kao [' + user + '] objavljujem u ' + str(vremena))
 
 def job():
 	while True:
 		if EasyG.jobbanje(user):
-			print('Geez, wrong img')
+			print('Dunno what does but works')
 			sleep(2)
 		else:
-			print('Gotov za danas')
+			print('Jedan manje, keep it up')
 			break
 
-schedule.every().day.at(vremena[0]).do(job)
-if vremena[1] != ' None':
-	schedule.every().day.at(vremena[1]).do(job)
-
+#  TERMINI OBAJVA IDU OD NAJRANIJEG DO NAJKASNIJEG VREMENA
+for vrijeme in vremena:
+    schedule.every().day.at(vrijeme).do(job)
 
 while True:
     schedule.run_pending()

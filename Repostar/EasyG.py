@@ -23,9 +23,11 @@ def jobbanje(user):
         htags = row[3]
         intro = intro.split(', ')
         htags = htags.split(', ')
+        min_likes = row[4][9:]
+        margin = row[5][6:]
 
     # ROKAVELA
-    s = Session(user, path, random.choice(intro), htags, instagramUsername, instagramPassword)
+    s = Session(user, path, random.choice(intro), htags, instagramUsername, instagramPassword, min_likes, margin)
     s.find_users_to_scrape()
     for _ in s.users:
         if s.is_user_used_in_this_loop(_):
