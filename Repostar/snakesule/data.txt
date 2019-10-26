@@ -1,4 +1,6 @@
 snakesule
 WeRock4295
 Name the species!, Tag your friend!, Your favourite snake?, Favourite breeder on IG?, How many snakes do you have?, Best thing about snakes?
-#snake , #snakepic , #snakesofinstagram , #reptile , #reptilesofinstagram , #reptiles , #reptilesofinstagram , #herpetology , #serpent , #herp , #reptilesofig
+#snake , #snakepic , #snakesofinstagram , #reptile , #reptilesofinstagram , #reptiles , #reptilesofinstagram , #herpetology , #serpent , #herp
+min_likes=250
+margin=95
