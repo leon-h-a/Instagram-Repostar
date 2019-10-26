@@ -1,0 +1,10 @@
+city
+frog
+insect
+lizard
+people
+pet
+snake
+spider
+turtle
+wildanimal
