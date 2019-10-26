@@ -1,6 +1,0 @@
-blahersto
-GetChar123
-Name the species!, Who should be featured next?, What is your favourite species?, Who is your favourite breeder?, Got any advices?, Got some fun facts?, Any cool news?
-#snake , #snakepic , #snakesofinstagram , #reptile , #reptilesofinstagram , #reptiles , #reptilesofinstagram , #herpetology , #serpent , #herp , #reptilesofig
-min likes=300
-margin=95
