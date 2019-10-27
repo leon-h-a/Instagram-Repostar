@@ -15,7 +15,7 @@ print('Kao [' + user + '] objavljujem u ' + str(vremena))
 def job():
 	while True:
 		if EasyG.jobbanje(user):
-			print('Dunno what does but works')
+			print('Exiting loop, nothing worthy')
 			sleep(2)
 		else:
 			print('Jedan manje, keep it up')
