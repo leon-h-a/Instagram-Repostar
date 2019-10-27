@@ -23,8 +23,8 @@ def jobbanje(user):
         htags = row[3]
         intro = intro.split(', ')
         htags = htags.split(', ')
-        min_likes = row[4][9:]
-        margin = row[5][6:]
+        min_likes = row[4][10:]
+        margin = row[5][7:]
 
     # ROKAVELA
     s = Session(user, path, random.choice(intro), htags, instagramUsername, instagramPassword, min_likes, margin)
