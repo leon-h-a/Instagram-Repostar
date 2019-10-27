@@ -21,10 +21,12 @@ def job():
 			print('Jedan manje, keep it up')
 			break
 
-#  TERMINI OBAJVA IDU OD NAJRANIJEG DO NAJKASNIJEG VREMENA
-for vrijeme in vremena:
-    schedule.every().day.at(vrijeme).do(job)
+job()
 
-while True:
-    schedule.run_pending()
-    sleep(1)
+#  TERMINI OBAJVA IDU OD NAJRANIJEG DO NAJKASNIJEG VREMENA
+# for vrijeme in vremena:
+#     schedule.every().day.at(vrijeme).do(job)
+#
+# while True:
+#     schedule.run_pending()
+#     sleep(1)
