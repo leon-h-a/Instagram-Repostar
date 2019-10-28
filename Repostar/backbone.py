@@ -4,6 +4,7 @@ from nerves import some_html
 from nerves import me_html
 from emoji import emojize
 import tensorflow as tf
+from time import sleep
 from io import open
 import datetime
 import sqlite3
@@ -35,7 +36,7 @@ class Session:
         self.instagramPassword = ig_pass
         self.intro = intro
         self.my_htags = htags
-        self.users = None
+        self.users = []
         self.min_likes = min_likes
         self.intro = intro
         self.my_htags = htags
@@ -43,12 +44,30 @@ class Session:
         self.will_post_it = None
         self.downloaded = None
         self.low_like = False
+        self.whitelist_users = []
+
+    def whitelist(self):
+        #  define users that don't need to pass min_likes value
+        '''
+        users are defined by adding " +" after their username in users.txt
+        '''
+        with open(self.img_dir + 'users.txt') as users_file:
+            users = users_file.read().splitlines()
+            for _ in users:
+                if ' +' in str(_):
+                    self.whitelist_users.append(_.strip(' +'))
+
+        if not self.whitelist_users:
+            print('Not a single user is whitelisted')
+        else:
+            print('--- Whitelisted guys ---')
+            print(*self.whitelist_users, sep = '\n')
 
 
     #  PROVJERI DAL thisLoop ODGOVARA SUMI SVIH USERA, AKO DA, KRENI ISPOCETKA SA VRHA POPISA
     def loop_done(self):
         with open(self.img_dir + 'users.txt') as users_file:
-            users = users_file.read().splitlines()
+            users = users_file.read().strip(' +').splitlines()
 
         with open(self.img_dir + 'thisLoop.txt') as loop_file:
             loop_users = loop_file.read().splitlines()
@@ -112,14 +131,20 @@ class Session:
             self.urls_n_likes.append(self.all_image_urls[_])
 
         list1, list2, list3 = zip(*sorted(zip(self.all_image_likes, self.all_image_urls, self.captions)))
+
+        #  check if user is whitelisted, if not, examine if above min_likes variable
+        for _ in self.whitelist_users:
+            if _ == user:
+                print('User is whitelisted going forward with his best unused pic')
+                return False
+
         if int(list1[-1]) >= int(self.min_likes):
             print('[{}] Najpopularnija slika ima {} lajkova (>{}). Prolazi'.format(user, list1[-1], self.min_likes))
             self.most_liked = list2[-1]
             self.most_liked_caption = list3[-1]
+            return False
         else:
             print('[{}] Najpopularnija slika ima {} lajkova (<{}). Preskacem'.format(user, list1[-1], self.min_likes))
-            with open(self.img_dir + 'underperforming.txt', 'a') as under_adders:
-                under_adders.write('\n' + user + (35 - len(str(user))) * ' ' + str(list1[-1]))
             return True
 
     #  POKUPI MOJ BROJ: PRATITELJA / PRATIOCA / OBJAVA
@@ -170,8 +195,9 @@ class Session:
             print('Please provide users to scrape in path/users.txt')
         with open(self.img_dir + 'users.txt', 'r', encoding='utf-8') as scrape_them:
             users = scrape_them.read().splitlines()
-        self.users = users
-
+            for _ in users:
+                self.users.append(_.strip(' +'))
+                
     #  PROVJERI DAL JE KORISNIK VEC SCRAPE-AN U OVOM KRUGU
     def is_user_used_in_this_loop(self, user):
         header = '\n' + 30 * '-' + '[' + user + ']'
