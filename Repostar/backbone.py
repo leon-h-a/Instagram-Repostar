@@ -187,7 +187,7 @@ class Session:
 
     #  SKINI SLIKU
     def download_pic(self):
-        urllib.request.urlretrieve(self.most_liked, self.img_dir + 'images/' + str(self.most_liked)[-85:][:-45] + '.jpg')
+        urllib.request.urlretrieve(self.most_liked, self.img_dir + '/images/' + str(self.most_liked)[-85:][:-45] + '.jpg')
 
     #  UCITAJ SVE KORISNIKE
     def find_users_to_scrape(self):
@@ -197,7 +197,7 @@ class Session:
             users = scrape_them.read().splitlines()
             for _ in users:
                 self.users.append(_.strip(' +'))
-
+                
     #  PROVJERI DAL JE KORISNIK VEC SCRAPE-AN U OVOM KRUGU
     def is_user_used_in_this_loop(self, user):
         header = '\n' + 30 * '-' + '[' + user + ']'
