@@ -29,7 +29,6 @@ def jobbanje(user):
     # ROKAVELA
     s = Session(user, path, random.choice(intro), htags, instagramUsername, instagramPassword, min_likes, margin)
     s.find_users_to_scrape()
-    s.whitelist()
     for _ in s.users:
         if s.is_user_used_in_this_loop(_):
             continue
