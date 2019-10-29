@@ -33,7 +33,8 @@ def jobbanje(user):
     for _ in s.users:
         if s.is_user_used_in_this_loop(_):
             continue
-        s.get_target_html(_)
+        if s.get_target_html(_):
+            continue
         if s.find_most_liked(_):
             continue
         if s.is_picture_used(_):
