@@ -92,6 +92,8 @@ class Session:
     #  UZMI PAGE SOURCE OD METE
     def get_target_html(self, someone_html):
         self.someone_html = some_html(someone_html)
+        if self.someone_html == 0:
+            return True
 
     #  IZ PAGE SURCE UZMI BROJ LAJKOVA ZADNJIH 10 SLIKA
     def all_image_like_count(self):
@@ -197,7 +199,7 @@ class Session:
             users = scrape_them.read().splitlines()
             for _ in users:
                 self.users.append(_.strip(' +'))
-                
+
     #  PROVJERI DAL JE KORISNIK VEC SCRAPE-AN U OVOM KRUGU
     def is_user_used_in_this_loop(self, user):
         header = '\n' + 30 * '-' + '[' + user + ']'
