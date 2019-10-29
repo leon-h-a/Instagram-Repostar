@@ -4,6 +4,7 @@ import requests
 import json
 import bs4
 import sys
+import os
 
 def some_html(username):
     test_string = '{"config":{"csrf_token":'
@@ -19,14 +20,30 @@ def some_html(username):
         try:
             html = json.loads(modified)
         except ValueError:
-            print('Provjeri spelling korisnickog imena i jel uopce postoji: {}'.format(username))
+            #  ValueError se najcesce pojavljuje ako user:
+            #  1. ima privatan profil
+            #  2. izbrisao je profil
+            #  3. spelling greska u users.txt
+            #  Spremi username u fix_users.txt
+            with open(os.getcwd() + '/snakesule/fix_users.txt', 'a+') as fix:
+                already_inside = fix.read()
+                if username not in already_inside:
+                    fix.write(username)
+                    print('Lazy is not good, fix_users.txt NOW!')
+            return 0
 
     else:
         modified = str(scripts[3])[:-10][52:]
         try:
             html = json.loads(modified)
         except ValueError:
-            print('Provjeri spelling korisnickog imena i jel uopce postoji: {}'.format(username))
+            #  Spremi username u fix_users.txt
+            with open(os.getcwd() + '/snakesule/fix_users.txt', 'a+') as fix:
+                already_inside = fix.read()
+                if username not in already_inside:
+                    fix.write(username)
+                    print('Lazy is not good, fix_users.txt NOW!')
+            return 0
 
     if 'html' not in locals():
         print('Gasim program')
