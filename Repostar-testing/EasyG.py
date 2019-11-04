@@ -42,6 +42,8 @@ def jobbanje(user):
         s.download_pic()
         if s.tensac(_):
             return True
+        if s.cap_check(_):
+            continue
         if s.upload(_):
             break
     s.loop_done()

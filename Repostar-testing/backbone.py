@@ -8,6 +8,7 @@ from time import sleep
 from io import open
 import datetime
 import sqlite3
+import random
 import urllib
 import os
 import re
@@ -45,6 +46,7 @@ class Session:
         self.downloaded = None
         self.low_like = False
         self.whitelist_users = []
+        self.caption = None
 
     def whitelist(self):
         #  define users that don't need to pass min_likes value
@@ -91,7 +93,7 @@ class Session:
 
     #  UZMI PAGE SOURCE OD METE
     def get_target_html(self, someone_html):
-        self.someone_html = some_html(someone_html)
+        self.someone_html = some_html(someone_html, self.me)
         if self.someone_html == 0:
             return True
 
@@ -217,32 +219,38 @@ class Session:
         with open(self.img_dir + 'thisLoop.txt', 'a') as loop_file:
             loop_file.write(user + '\n')
 
-    #  OBJAVI SLIKU
-    def upload(self, user):
+            
+    def cap_check(self, user):
+        #  Find number of htags in a post
         pattern = re.compile(r'#')
         matches = len(pattern.findall(self.most_liked_caption))
-        mah_htags = ''
-        num_of_my_htags = 30 - matches
+        mah_htags = []
+        num_of_my_htags = 30 - matches + 2 #  +2 as a safety
 
-        if num_of_my_htags >= 10:
-            num_of_my_htags = 10
-            for one in range(num_of_my_htags):
-                mah_htags = mah_htags + str(self.my_htags[one])
-            caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + mah_htags[:-1] + '\n:four_leaf_clover:\n' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
+        #  Append and shuffle htags
+        for _ in range (num_of_my_htags):
+            if len(self.my_htags) > _ :
+                mah_htags.append(str(self.my_htags[_]))
+            else:
+                break
+        random.shuffle(mah_htags)
+        mah_htags = ' '.join(mah_htags)
 
-        elif num_of_my_htags <= 3:
-            caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + '\n:four_leaf_clover:\n' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
+        #  Check if total lengh of caption is less than 2000 chars, break main loop if longer!
+        if len(self.intro) + len(self.most_liked_caption) > 2000:
+            return True
 
-        else:
-            for one in range(num_of_my_htags):
-                mah_htags = mah_htags + str(self.my_htags[one])
+        #  Else create caption variable
+        self.caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + str(mah_htags) + '\n:four_leaf_clover:\n' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
 
-            caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + mah_htags[:-1] + '\n:four_leaf_clover:' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
+
+    #  OBJAVI SLIKU
+    def upload(self, user):
 
         image = self.img_dir + '/images/' + str(self.most_liked)[-85:][:-45] + '.jpg'
         ig = InstagramAPI(self.instagramUsername, self.instagramPassword)
         ig.login()
-        ig.uploadPhoto(image, caption=caption)
+        ig.uploadPhoto(image, caption=self.caption)
         # PROVJERI JEL BAZA POSTOJI, AKO NE, NAPRAVI JU
         if not os.path.exists(self.img_dir + str(self.me) + '.db'):
             database = sqlite3.connect(self.me + '.db')
