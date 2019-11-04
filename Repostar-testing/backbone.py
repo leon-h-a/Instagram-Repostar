@@ -217,15 +217,16 @@ class Session:
         with open(self.img_dir + 'thisLoop.txt', 'a') as loop_file:
             loop_file.write(user + '\n')
 
-    #  OBJAVI SLIKU
-    def upload(self, user):
+    #  Check for caption lenght and hashtag number limitations
+    def cap_check (self, user):
+        #  Find number of htags
         pattern = re.compile(r'#')
         matches = len(pattern.findall(self.most_liked_caption))
-        mah_htags = ''
+        mah_htags = None
         num_of_my_htags = 30 - matches
 
         if num_of_my_htags >= 10:
-            num_of_my_htags = 10
+            num_of_my_htags = 8
             for one in range(num_of_my_htags):
                 mah_htags = mah_htags + str(self.my_htags[one])
             caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + mah_htags[:-1] + '\n:four_leaf_clover:\n' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
@@ -237,8 +238,10 @@ class Session:
             for one in range(num_of_my_htags):
                 mah_htags = mah_htags + str(self.my_htags[one])
 
-            caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + mah_htags[:-1] + '\n:four_leaf_clover:' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
+                caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + mah_htags[:-1] + '\n:four_leaf_clover:' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
 
+    #  OBJAVI SLIKU
+    def upload(self, user):
         image = self.img_dir + '/images/' + str(self.most_liked)[-85:][:-45] + '.jpg'
         ig = InstagramAPI(self.instagramUsername, self.instagramPassword)
         ig.login()
