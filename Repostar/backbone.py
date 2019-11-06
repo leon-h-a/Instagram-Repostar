@@ -62,8 +62,9 @@ class Session:
         if not self.whitelist_users:
             print('Not a single user is whitelisted')
         else:
-            print('--- Whitelisted guys ---')
+            print('\n\n= = = = = WHITELIST = = = = = ')
             print(*self.whitelist_users, sep = '\n')
+            print('= = = = = WHITELIST = = = = = \n\n')
 
 
     #  PROVJERI DAL thisLoop ODGOVARA SUMI SVIH USERA, AKO DA, KRENI ISPOCETKA SA VRHA POPISA
@@ -139,7 +140,9 @@ class Session:
         #  check if user is whitelisted, if not, examine if above min_likes variable
         for _ in self.whitelist_users:
             if _ == user:
-                print('User is whitelisted going forward with his best unused pic')
+                print('User is whitelisted going forward with his best unused picture')
+                self.most_liked = list2[-1]
+                self.most_liked_caption = list3[-1]
                 return False
 
         if int(list1[-1]) >= int(self.min_likes):
@@ -219,7 +222,7 @@ class Session:
         with open(self.img_dir + 'thisLoop.txt', 'a') as loop_file:
             loop_file.write(user + '\n')
 
-            
+
     def cap_check(self, user):
         #  Find number of htags in a post
         pattern = re.compile(r'#')
