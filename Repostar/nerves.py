@@ -6,7 +6,7 @@ import bs4
 import sys
 import os
 
-def some_html(username):
+def some_html(username, me):
     test_string = '{"config":{"csrf_token":'
 
     a = requests.get('https://www.instagram.com/' + str(username) + '/')
@@ -24,11 +24,12 @@ def some_html(username):
             #  1. ima privatan profil
             #  2. izbrisao je profil
             #  3. spelling greska u users.txt
+
             #  Spremi username u fix_users.txt
-            with open(os.getcwd() + '/snakesule/fix_users.txt', 'a+') as fix:
+            with open(os.getcwd() + '/' + me + '/fix_users.txt', 'a+') as fix:
                 already_inside = fix.read()
                 if username not in already_inside:
-                    fix.write(username)
+                    fix.write(username + '\n')
                     print('Lazy is not good, fix_users.txt NOW!')
             return 0
 
@@ -38,10 +39,10 @@ def some_html(username):
             html = json.loads(modified)
         except ValueError:
             #  Spremi username u fix_users.txt
-            with open(os.getcwd() + '/snakesule/fix_users.txt', 'a+') as fix:
+            with open(os.getcwd() + '/' + me + '/fix_users.txt', 'a+') as fix:
                 already_inside = fix.read()
                 if username not in already_inside:
-                    fix.write(username)
+                    fix.write(username + '\n')
                     print('Lazy is not good, fix_users.txt NOW!')
             return 0
 
