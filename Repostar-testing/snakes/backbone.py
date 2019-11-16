@@ -47,6 +47,7 @@ class Session:
         self.low_like = False
         self.whitelist_users = []
         self.caption = None
+        self.custom_cap = None
 
     def whitelist(self):
         #  define users that don't need to pass min_likes value
@@ -63,11 +64,11 @@ class Session:
             print('Not a single user is whitelisted')
         else:
             print('\n\n= = = = = WHITELIST = = = = = ')
-            print(*self.whitelist_users, sep = '\n')
+            print(*self.whitelist_users, sep='\n')
             print('= = = = = WHITELIST = = = = = \n\n')
 
-
     #  PROVJERI DAL thisLoop ODGOVARA SUMI SVIH USERA, AKO DA, KRENI ISPOCETKA SA VRHA POPISA
+
     def loop_done(self):
         with open(self.img_dir + 'users.txt') as users_file:
             users = users_file.read().strip(' +').splitlines()
@@ -122,7 +123,8 @@ class Session:
                 if img_type == 'GraphImage':
                     self.all_image_likes.append(self.someone_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'][_]['node']['edge_liked_by']['count'])
                     self.all_image_urls.append(self.someone_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'][_]['node']['display_url'])
-                    self.captions.append(self.someone_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges'][_]['node']['edge_media_to_caption']['edges'][0]['node']['text'])
+                    self.captions.append(self.someone_html['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']
+                                         ['edges'][_]['node']['edge_media_to_caption']['edges'][0]['node']['text'])
                 else:
                     print('[{}] Objava broj {} je video ili album, preskacem ju'.format(user, _))
                     continue
@@ -222,22 +224,22 @@ class Session:
         with open(self.img_dir + 'thisLoop.txt', 'a') as loop_file:
             loop_file.write(user + '\n')
 
-
     def cap_check(self, user):
         #  Check for custom caption in custom_cap.txt
-        with open(os.getcwd + '/' + self.me + '/' + 'custom_cap.txt') as custom_cap:
-            cap = custom_cap.read().splitlines()
-        full = cap[0] + '@' + self.me + ' ' + cap[1] + cap[2] + '@' + user + cap[3] + self.most_liked_caption + cap[4]
+        with open(str(os.getcwd()) + '/' + self.me + '/' + 'custom_cap.txt') as custom:
+            cap = custom.read().splitlines()
+        full = emojize(cap[0] + '\n' + cap[1] + '\n' + cap[2] + '\n' + cap[3] + '\n-----\n@' + self.me + ' ' + cap[4] + '\n-----\n' + cap[5] + '\n-----\n' + cap[6] + ' @' + user + '\n' + cap[7] + self.most_liked_caption + '\n-----\n' + cap[8] + '\n-----\n' + cap[9], use_aliases=True)
+        self.custom_cap = full
 
         #  Find number of htags in a post
         pattern = re.compile(r'#')
         matches = len(pattern.findall(self.most_liked_caption))
         mah_htags = []
-        num_of_my_htags = 30 - matches + 2 #  +2 as a safety
+        num_of_my_htags = 30 - matches + 2  # +2 as a safety
 
         #  Append and shuffle htags
-        for _ in range (num_of_my_htags):
-            if len(self.my_htags) > _ :
+        for _ in range(num_of_my_htags):
+            if len(self.my_htags) > _:
                 mah_htags.append(str(self.my_htags[_]))
             else:
                 break
@@ -248,9 +250,14 @@ class Session:
         if len(self.intro) + len(self.most_liked_caption) > 2000:
             return True
 
-        #  Else create caption variable
-        self.caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + str(mah_htags) + '\n:four_leaf_clover:\n' + 15 * ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
+        if cap[-1] == 'False':
+            self.caption = emojize(self.intro + '\n:snake: Credit @' + str(user) + ': ' + self.most_liked_caption + str(mah_htags) + '\n:four_leaf_clover:\n' + 15 *
+                                   ' :four_leaf_clover: ' + '\nChance for a FREE shoutout if you tag @' + self.instagramUsername + ' or use #' + self.instagramUsername, use_aliases=True)
+        elif cap[-1] == 'True':
+            self.caption = self.custom_cap
 
+        else:
+            print('Last line in custom_cap.txt has to be "True" or "False"')
 
     #  OBJAVI SLIKU
     def upload(self, user):
@@ -315,7 +322,6 @@ class Session:
                 print('%s (score = %.5f)' % (human_string, score))
 
             print('Na slici je: ' + str(blah1[0]) + ' i ovoliko sam siguran: ' + str(blah2[0] * 100))
-
 
             if str(blah1[0]) == 'snake' and int(blah2[0] * 100) >= int(self.margin):
                 print('Tako da bum objavio')
